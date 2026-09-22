@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Problem Generator - โหมดเกมฝึกสมองตามระดับชั้น</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti CDN for Fireworks/Confetti effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-700 relative overflow-x-hidden">
+
+    <!-- Header with Stats (Hearts & Score) -->
+    <header class="w-full py-4 px-6 sm:px-12 flex justify-between items-center border-b border-slate-200 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                +
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-slate-900 tracking-tight">MathGame</h1>
+                <p class="text-xs text-slate-500">Minimalist Math Challenge (ป.1 - ม.6)</p>
+            </div>
+        </div>
+
+        <!-- Game Stats: Hearts & Score -->
+        <div class="flex items-center space-x-4 sm:space-x-6">
+            <div class="flex items-center space-x-1.5 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-full" id="hearts-container" title="พลังชีวิต (3 หัวใจ)">
+                <span class="text-lg">❤️</span>
+                <span class="text-lg">❤️</span>
+                <span class="text-lg">❤️</span>
+            </div>
+            <div class="flex items-center space-x-2 bg-indigo-50 border border-indigo-100 px-4 py-1.5 rounded-full">
+                <span class="text-xs font-semibold text-indigo-500 uppercase">คะแนน</span>
+                <span id="score-display" class="font-bold text-indigo-700 text-base">0</span>
+            </div>
+            <button id="view-scores-btn" class="text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition-all cursor-pointer">
+                🏆 ตารางคะแนน
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8">
+        
+        <!-- Controls Card: Grade Levels, Operations & Difficulty -->
+        <section id="settings-section" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm transition-all duration-300 flex flex-col gap-6">
+            
+            <!-- Grade Level Selector (ป.1 - ม.6) -->
+            <div>
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">1. เลือกระดับชั้นเรียน (ป.1 - ม.6)</h2>
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                    <button type="button" data-grade="p1" class="grade-btn py-2 px-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold text-xs sm:text-sm transition-all">ป.1</button>
+                    <button type="button" data-grade="p2" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ป.2</button>
+                    <button type="button" data-grade="p3" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ป.3</button>
+                    <button type="button" data-grade="p4" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ป.4</button>
+                    <button type="button" data-grade="p5" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ป.5</button>
+                    <button type="button" data-grade="p6" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ป.6</button>
+                    <button type="button" data-grade="m1" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.1</button>
+                    <button type="button" data-grade="m2" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.2</button>
+                    <button type="button" data-grade="m3" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.3</button>
+                    <button type="button" data-grade="m4" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.4</button>
+                    <button type="button" data-grade="m5" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.5</button>
+                    <button type="button" data-grade="m6" class="grade-btn py-2 px-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 text-slate-600 font-semibold text-xs sm:text-sm transition-all">ม.6</button>
+                </div>
+                <p id="grade-description" class="text-xs text-indigo-600 font-medium mt-2">ประถมศึกษาปีที่ 1: เน้นการบวกและการลบเลขจำนวนไม่เกิน 20</p>
+            </div>
+
+            <!-- Operations Checkboxes -->
+            <div>
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">2. ประเภทการคำนวณที่เลือก (ปรับอัตโนมัติตามระดับชั้น)</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="operations-container">
+                    <label class="op-card cursor-pointer border border-indigo-600 bg-indigo-50/50 rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group">
+                        <input type="checkbox" name="operation" value="add" checked class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">➕</span>
+                        <span class="text-xs font-medium text-indigo-600">บวก (+)</span>
+                    </label>
+                    <label class="op-card cursor-pointer border border-indigo-600 bg-indigo-50/50 rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group">
+                        <input type="checkbox" name="operation" value="sub" checked class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">➖</span>
+                        <span class="text-xs font-medium text-indigo-600">ลบ (-)</span>
+                    </label>
+                    <label class="op-card cursor-pointer border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group opacity-40">
+                        <input type="checkbox" name="operation" value="mul" class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">✖️</span>
+                        <span class="text-xs font-medium text-slate-600">คูณ (×)</span>
+                    </label>
+                    <label class="op-card cursor-pointer border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group opacity-40">
+                        <input type="checkbox" name="operation" value="div" class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">➗</span>
+                        <span class="text-xs font-medium text-slate-600">หาร (÷)</span>
+                    </label>
+                    <label class="op-card cursor-pointer border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group opacity-40">
+                        <input type="checkbox" name="operation" value="pow" class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">⚡</span>
+                        <span class="text-xs font-medium text-slate-600">ยกกำลัง (^)</span>
+                    </label>
+                    <label class="op-card cursor-pointer border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1 transition-all select-none group opacity-40">
+                        <input type="checkbox" name="operation" value="other" class="hidden peer">
+                        <span class="text-xl group-hover:scale-110 transition-transform">📐</span>
+                        <span class="text-xs font-medium text-slate-600">ขั้นสูง/ฟังก์ชัน</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Card Area -->
+        <section id="game-card" class="bg-white rounded-2xl p-8 sm:p-12 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center min-h-[340px] relative overflow-hidden transition-all duration-300">
+            
+            <div class="absolute top-4 left-6 text-xs text-slate-400 font-medium uppercase tracking-wider" id="active-grade-badge">
+                ระดับชั้น: ประถมศึกษาปีที่ 1 (ป.1)
+            </div>
+
+            <!-- Problem Container -->
+            <div id="problem-display" class="my-6 transition-all duration-300 transform scale-100">
+                <span class="text-4xl sm:text-6xl font-semibold text-slate-800 tracking-wide">กดปุ่ม "เริ่มเกม / ข้อถัดไป"</span>
+            </div>
+
+            <!-- Answer Input & Check Area -->
+            <div id="input-container" class="w-full max-w-xs mb-4 hidden flex flex-col gap-3">
+                <div class="flex gap-2">
+                    <input type="text" id="user-answer" placeholder="พิมพ์คำตอบของคุณ..." class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:outline-none px-4 py-3 rounded-xl text-center text-lg font-medium text-slate-800 transition-all">
+                    <button id="check-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-xl transition-all cursor-pointer shadow-sm">
+                        ส่งคำตอบ
+                    </button>
+                </div>
+                <div id="feedback-message" class="text-sm font-medium hidden"></div>
+            </div>
+
+            <!-- Answer Container (Shown on mistake or skip) -->
+            <div id="answer-container" class="hidden mt-2 mb-2 p-4 bg-indigo-50 border border-indigo-100 rounded-xl transition-all duration-300 w-full max-w-xs">
+                <span class="text-xs text-indigo-500 font-semibold uppercase block mb-1">เฉลยที่ถูกต้อง</span>
+                <span id="answer-text" class="text-xl sm:text-2xl font-bold text-indigo-700">-</span>
+            </div>
+
+            <!-- Game Over Screen (Hidden by default) -->
+            <div id="game-over-screen" class="hidden flex flex-col items-center gap-4 py-6 w-full max-w-md animate-fadeIn">
+                <div class="w-16 h-16 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-3xl font-bold mb-1">
+                    💀
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">จบเกมแล้ว! (Game Over)</h3>
+                <p class="text-slate-600 text-sm">หัวใจของคุณหมดลงแล้ว ทำคะแนนรวมได้:</p>
+                <div class="text-4xl font-extrabold text-indigo-600 my-1"><span id="final-score">0</span> คะแนน</div>
+                
+                <!-- Save score form -->
+                <div class="w-full flex flex-col gap-3 mt-2">
+                    <input type="text" id="player-name" placeholder="กรอกชื่อของคุณเพื่อบันทึกคะแนน..." class="bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:outline-none px-4 py-3 rounded-xl text-center text-sm font-medium text-slate-800">
+                    <button id="save-score-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-sm transition-all cursor-pointer">
+                        💾 บันทึกคะแนนลงตาราง
+                    </button>
+                    <button id="restart-game-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl transition-all cursor-pointer">
+                        🔄 เริ่มเกมใหม่อีกครั้ง
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div id="action-controls" class="flex flex-wrap items-center justify-center gap-3 mt-6">
+                <button id="generate-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3.5 rounded-xl shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2 cursor-pointer">
+                    <span>🚀 เริ่มเกม / ข้อถัดไป</span>
+                </button>
+                <button id="toggle-answer-btn" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium px-6 py-3.5 rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    👁️ ยอมแพ้ / ดูเฉลย (-1 หัวใจ)
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Scoreboard Modal -->
+    <div id="scoreboard-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-xl border border-slate-200 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                    <span>🏆</span> ตารางคะแนนผู้เล่นทั้งหมด
+                </h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">
+                    &times;
+                </button>
+            </div>
+            <div class="overflow-y-auto flex-1 divide-y divide-slate-100 pr-1" id="scoreboard-list">
+                <div class="py-4 text-center text-slate-400 text-sm">ยังไม่มีบันทึกคะแนน</div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                <button id="clear-scores-btn" class="text-xs text-rose-500 hover:underline">ล้างประวัติคะแนน</button>
+                <button id="close-modal-footer" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full py-6 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+        Math Problem Generator with Fireworks Effect (ป.1 - ม.6)
+    </footer>
+
+    <script>
+        // Grade Configuration Rules (ป.1 - ม.6)
+        const gradeConfigs = {
+            p1: { name: "ประถมศึกษาปีที่ 1 (ป.1)", desc: "เน้นการบวกและการลบเลขจำนวนไม่เกิน 20", ops: ['add', 'sub'], min: 1, max: 20 },
+            p2: { name: "ประถมศึกษาปีที่ 2 (ป.2)", desc: "บวก ลบ จำนวนไม่เกิน 1,000 และเริ่มท่องสูตรคูณแม่พื้นฐาน", ops: ['add', 'sub', 'mul'], min: 1, max: 100 },
+            p3: { name: "ประถมศึกษาปีที่ 3 (ป.3)", desc: "การบวก ลบ คูณ หารระคน และหารลงตัวไม่เกิน 100", ops: ['add', 'sub', 'mul', 'div'], min: 1, max: 500 },
+            p4: { name: "ประถมศึกษาปีที่ 4 (ป.4)", desc: "จำนวนนับที่มากกว่า 100,000 การหารยาว และเศษส่วนเบื้องต้น", ops: ['add', 'sub', 'mul', 'div', 'other'], min: 10, max: 1000 },
+            p5: { name: "ประถมศึกษาปีที่ 5 (ป.5)", desc: "เศษส่วน ทศนิยม และการคำนวณพื้นที่รูปเรขาคณิต", ops: ['add', 'sub', 'mul', 'div', 'other'], min: 20, max: 5000 },
+            p6: { name: "ประถมศึกษาปีที่ 6 (ป.6)", desc: "หส.ม., ครน., อัตราส่วน ร้อยละ และโจทย์ปัญหาประสม", ops: ['add', 'sub', 'mul', 'div', 'other'], min: 50, max: 10000 },
+            m1: { name: "มัธยมศึกษาปีที่ 1 (ม.1)", desc: "จำนวนเต็ม, เลขยกกำลังมีเลขชี้กำลังเป็นจำนวนเต็มบวก, ทศนิยมและเศษส่วน", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -50, max: 100 },
+            m2: { name: "มัธยมศึกษาปีที่ 2 (ม.2)", desc: "เลขยกกำลัง, พหูคูณ, การแยกตัวประกอบ และพื้นที่ผิวปริมาตร", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -100, max: 500 },
+            m3: { name: "มัธยมศึกษาปีที่ 3 (ม.3)", desc: "กรณฑ์ที่สอง (รากที่สอง), อสมการ, สมการกำลังสอง และตรีโกณมิติเบื้องต้น", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -500, max: 1000 },
+            m4: { name: "มัธยมศึกษาปีที่ 4 (ม.4)", desc: "เซต, ตรรกศาสตร์, จำนวนจริง และฟังก์ชัน", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -1000, max: 5000 },
+            m5: { name: "มัธยมศึกษาปีที่ 5 (ม.5)", desc: "เลขยกกำลังตรรกยะ, ฟังก์ชันเอกซ์โพเนนเชียล, ลอการิทึม และลำดับอนุกรม", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -5000, max: 10000 },
+            m6: { name: "มัธยมศึกษาปีที่ 6 (ม.6)", desc: "แคลคูลัส (อนุพันธ์และปริพันธ์), สถิติศาสตร์ และความน่าจะเป็นขั้นสูง", ops: ['add', 'sub', 'mul', 'div', 'pow', 'other'], min: -10000, max: 50000 }
+        };
+
+        let currentGrade = 'p1';
+        let currentAnswer = '';
+        let hasGenerated = false;
+        let score = 0;
+        let hearts = 3;
+        let isGameOver = false;
+        
+        let recentProblems = [];
+        const MAX_HISTORY = 30;
+
+        // DOM Elements
+        const gradeButtons = document.querySelectorAll('.grade-btn');
+        const gradeDescription = document.getElementById('grade-description');
+        const activeGradeBadge = document.getElementById('active-grade-badge');
+        const opCheckboxes = document.querySelectorAll('input[name="operation"]');
+        const generateBtn = document.getElementById('generate-btn');
+        const toggleAnswerBtn = document.getElementById('toggle-answer-btn');
+        const problemDisplay = document.getElementById('problem-display');
+        const answerContainer = document.getElementById('answer-container');
+        const answerText = document.getElementById('answer-text');
+        const inputContainer = document.getElementById('input-container');
+        const userInput = document.getElementById('user-answer');
+        const checkBtn = document.getElementById('check-btn');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const heartsContainer = document.getElementById('hearts-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreText = document.getElementById('final-score');
+        const saveScoreBtn = document.getElementById('save-score-btn');
+        const restartGameBtn = document.getElementById('restart-game-btn');
+        const playerNameInput = document.getElementById('player-name');
+        const viewScoresBtn = document.getElementById('view-scores-btn');
+        const scoreboardModal = document.getElementById('scoreboard-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const closeModalfFn = document.getElementById('close-modal-footer');
+        const scoreboardList = document.getElementById('scoreboard-list');
+        const clearScoresBtn = document.getElementById('clear-scores-btn');
+        const settingsSection = document.getElementById('settings-section');
+        const actionControls = document.getElementById('action-controls');
+        const gameCard = document.getElementById('game-card');
+
+        // Fireworks / Confetti Celebration Effect
+        function triggerFireworks() {
+            // Burst of confetti mimicking fireworks from bottom/sides
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, {
+                spread: 26,
+                startVelocity: 55,
+            });
+            fire(0.2, {
+                spread: 60,
+            });
+            fire(0.35, {
+                spread: 100,
+                decay: 0.91,
+                scalar: 0.8
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 25,
+                decay: 0.92,
+                scalar: 1.2
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 45,
+            });
+
+            // Add glow ring animation to game card
+            gameCard.classList.add('ring-4', 'ring-emerald-400', 'shadow-lg', 'bg-emerald-50/20');
+            setTimeout(() => {
+                gameCard.classList.remove('ring-4', 'ring-emerald-400', 'shadow-lg', 'bg-emerald-50/20');
+            }, 1000);
+        }
+
+        // Update active operations according to selected grade
+        function applyGradeConfig(gradeKey) {
+            currentGrade = gradeKey;
+            const config = gradeConfigs[gradeKey];
+            gradeDescription.textContent = `${config.name}: ${config.desc}`;
+            activeGradeBadge.textContent = `ระดับชั้น: ${config.name}`;
+
+            opCheckboxes.forEach(cb => {
+                const label = cb.closest('label');
+                const opVal = cb.value;
+                if (config.ops.includes(opVal)) {
+                    cb.disabled = false;
+                    cb.checked = true;
+                    label.classList.remove('opacity-40');
+                    label.classList.add('border-indigo-600', 'bg-indigo-50/50');
+                    label.classList.remove('border-slate-200', 'bg-white');
+                } else {
+                    cb.disabled = true;
+                    cb.checked = false;
+                    label.classList.add('opacity-40');
+                    label.classList.remove('border-indigo-600', 'bg-indigo-50/50');
+                    label.classList.add('border-slate-200', 'bg-white');
+                }
+            });
+        }
+
+        // Grade Selection Handler
+        gradeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGameOver) return;
+                gradeButtons.forEach(b => {
+                    b.classList.remove('border-indigo-600', 'bg-indigo-50', 'text-indigo-700', 'font-semibold');
+                    b.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
+                });
+                btn.classList.add('border-indigo-600', 'bg-indigo-50', 'text-indigo-700', 'font-semibold');
+                btn.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
+                
+                applyGradeConfig(btn.getAttribute('data-grade'));
+                generateProblem();
+            });
+        });
+
+        // Update Hearts Visual
+        function updateHeartsUI() {
+            let heartsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < hearts) {
+                    heartsHTML += '<span class="text-lg">❤️</span>';
+                } else {
+                    heartsHTML += '<span class="text-lg opacity-30 grayscale">🖤</span>';
+                }
+            }
+            heartsContainer.innerHTML = heartsHTML;
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Generate Problem based on Grade Configuration
+        function generateProblem() {
+            if (isGameOver) return;
+
+            const config = gradeConfigs[currentGrade];
+            const selectedOps = Array.from(opCheckboxes)
+                .filter(cb => cb.checked && !cb.disabled)
+                .map(cb => cb.value);
+
+            if (selectedOps.length === 0) {
+                problemDisplay.innerHTML = `<span class="text-xl sm:text-2xl font-medium text-rose-500">ระดับชั้นนี้ไม่มีประเภทคำนวณที่เปิดใช้งาน</span>`;
+                answerContainer.classList.add('hidden');
+                inputContainer.classList.add('hidden');
+                toggleAnswerBtn.disabled = true;
+                hasGenerated = false;
+                return;
+            }
+
+            let attempts = 0;
+            let num1, num2, problemStr, ansStr, uniqueKey;
+            let minVal = config.min;
+            let maxVal = config.max;
+
+            do {
+                const op = selectedOps[Math.floor(Math.random() * selectedOps.length)];
+                
+                switch (op) {
+                    case 'add':
+                        num1 = getRandomInt(Math.max(1, minVal), maxVal);
+                        num2 = getRandomInt(Math.max(1, minVal), maxVal);
+                        problemStr = `${num1.toLocaleString()} + ${num2.toLocaleString()} = ?`;
+                        ansStr = `${num1 + num2}`;
+                        uniqueKey = `add_${num1}_${num2}`;
+                        break;
+                    case 'sub':
+                        num1 = getRandomInt(Math.max(1, minVal), maxVal);
+                        num2 = getRandomInt(Math.max(1, minVal), maxVal);
+                        if (num1 < num2 && currentGrade !== 'm1' && currentGrade !== 'm2' && currentGrade !== 'm3' && currentGrade !== 'm4' && currentGrade !== 'm5' && currentGrade !== 'm6') { 
+                            [num1, num2] = [num2, num1]; 
+                        }
+                        problemStr = `${num1.toLocaleString()} - ${num2.toLocaleString()} = ?`;
+                        ansStr = `${num1 - num2}`;
+                        uniqueKey = `sub_${num1}_${num2}`;
+                        break;
+                    case 'mul':
+                        let mMax1 = Math.min(maxVal, currentGrade === 'p2' ? 12 : 99);
+                        let mMax2 = Math.min(maxVal, currentGrade === 'p2' ? 12 : 99);
+                        num1 = getRandomInt(2, mMax1);
+                        num2 = getRandomInt(2, mMax2);
+                        problemStr = `${num1.toLocaleString()} × ${num2.toLocaleString()} = ?`;
+                        ansStr = `${num1 * num2}`;
+                        uniqueKey = `mul_${num1}_${num2}`;
+                        break;
+                    case 'div':
+                        let dMaxD = currentGrade === 'p3' ? 12 : 25;
+                        num2 = getRandomInt(2, dMaxD);
+                        let quotient = getRandomInt(2, dMaxD);
+                        num1 = num2 * quotient;
+                        problemStr = `${num1.toLocaleString()} ÷ ${num2.toLocaleString()} = ?`;
+                        ansStr = `${quotient}`;
+                        uniqueKey = `div_${num1}_${num2}`;
+                        break;
+                    case 'pow':
+                        let baseMax = currentGrade.startsWith('m') ? 15 : 5;
+                        let expMax = currentGrade === 'm1' ? 3 : (currentGrade === 'm2' ? 4 : 5);
+                        num1 = getRandomInt(2, baseMax);
+                        num2 = getRandomInt(2, expMax);
+                        problemStr = `${num1}<sup>${num2}</sup> = ?`;
+                        ansStr = `${Math.pow(num1, num2)}`;
+                        uniqueKey = `pow_${num1}_${num2}`;
+                        break;
+                    case 'other':
+                        if (currentGrade === 'm3' || currentGrade === 'm4' || currentGrade === 'm5' || currentGrade === 'm6') {
+                            const roots = [16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225, 256, 289, 324, 361, 400];
+                            const selectedRoot = roots[Math.floor(Math.random() * roots.length)];
+                            problemStr = `√${selectedRoot} = ?`;
+                            ansStr = `${Math.sqrt(selectedRoot)}`;
+                            uniqueKey = `sqrt_${selectedRoot}`;
+                        } else {
+                            const denom = getRandomInt(4, 12);
+                            const numA = getRandomInt(1, denom - 1);
+                            const numB = getRandomInt(1, denom - 1);
+                            problemStr = `(${numA}/${denom}) + (${numB}/${denom}) = ?`;
+                            ansStr = `${numA + numB}/${denom}`;
+                            uniqueKey = `frac_${numA}_${numB}_${denom}`;
+                        }
+                        break;
+                }
+
+                attempts++;
+                if (!recentProblems.includes(uniqueKey) || attempts > 20) {
+                    break;
+                }
+            } while (true);
+
+            recentProblems.push(uniqueKey);
+            if (recentProblems.length > MAX_HISTORY) {
+                recentProblems.shift();
+            }
+
+            problemDisplay.innerHTML = `<span class="text-3xl sm:text-5xl font-bold text-slate-800 tracking-tight">${problemStr}</span>`;
+            currentAnswer = ansStr;
+            
+            userInput.value = '';
+            feedbackMessage.classList.add('hidden');
+            answerContainer.classList.add('hidden');
+            answerText.textContent = currentAnswer;
+            inputContainer.classList.remove('hidden');
+            toggleAnswerBtn.textContent = "👁️ ยอมแพ้ / ดูเฉลย (-1 หัวใจ)";
+            toggleAnswerBtn.disabled = false;
+            hasGenerated = true;
+            userInput.focus();
+        }
+
+        function checkAnswer() {
+            if (!hasGenerated || isGameOver) return;
+            const userVal = userInput.value.trim();
+            if (userVal === '') return;
+
+            feedbackMessage.classList.remove('hidden');
+            if (userVal === currentAnswer) {
+                score += 10;
+                scoreDisplay.textContent = score;
+                feedbackMessage.textContent = "🎉 ถูกต้อง! +10 คะแนน";
+                feedbackMessage.className = "text-sm font-semibold text-emerald-600 block animate-fadeIn";
+                
+                // Trigger celebratory fireworks effect
+                triggerFireworks();
+
+                setTimeout(() => {
+                    if (!isGameOver) generateProblem();
+                }, 1500);
+            } else {
+                hearts--;
+                updateHeartsUI();
+                feedbackMessage.textContent = "❌ ผิดครับ! เสีย 1 หัวใจ";
+                feedbackMessage.className = "text-sm font-semibold text-rose-500 block animate-fadeIn";
+                
+                if (hearts <= 0) {
+                    triggerGameOver();
+                }
+            }
+        }
+
+        function triggerGameOver() {
+            isGameOver = true;
+            problemDisplay.innerHTML = `<span class="text-2xl font-bold text-rose-600">เกมสิ้นสุดแล้ว!</span>`;
+            inputContainer.classList.add('hidden');
+            answerContainer.classList.add('hidden');
+            actionControls.classList.add('hidden');
+            settingsSection.classList.add('opacity-50', 'pointer-events-none');
+            
+            finalScoreText.textContent = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function restartGame() {
+            score = 0;
+            hearts = 3;
+            isGameOver = false;
+            scoreDisplay.textContent = score;
+            updateHeartsUI();
+            gameOverScreen.classList.add('hidden');
+            actionControls.classList.remove('hidden');
+            settingsSection.classList.remove('opacity-50', 'pointer-events-none');
+            generateProblem();
+        }
+
+        function saveScore() {
+            const name = playerNameInput.value.trim() || 'ผู้เล่นนิรนาม';
+            const scores = JSON.parse(localStorage.getItem('math_game_scores_grades') || '[]');
+            scores.push({ name, score, grade: gradeConfigs[currentGrade].name, date: new Date().toLocaleDateString('th-TH') });
+            scores.sort((a, b) => b.score - a.score);
+            localStorage.setItem('math_game_scores_grades', JSON.stringify(scores));
+            
+            alert("บันทึกคะแนนเรียบร้อยแล้ว!");
+            showScoreboard();
+        }
+
+        function showScoreboard() {
+            const scores = JSON.parse(localStorage.getItem('math_game_scores_grades') || '[]');
+            if (scores.length === 0) {
+                scoreboardList.innerHTML = `<div class="py-8 text-center text-slate-400 text-sm">ยังไม่มีบันทึกคะแนนของผู้เล่น</div>`;
+            } else {
+                scoreboardList.innerHTML = scores.map((item, index) => `
+                    <div class="py-3 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">${index + 1}</span>
+                            <div>
+                                <span class="font-medium text-slate-800 text-sm block">${item.name}</span>
+                                <span class="text-[10px] text-slate-400">${item.grade}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-slate-400">${item.date}</span>
+                            <span class="font-bold text-indigo-600 text-sm">${item.score} คะแนน</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            scoreboardModal.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', generateProblem);
+        checkBtn.addEventListener('click', checkAnswer);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        toggleAnswerBtn.addEventListener('click', () => {
+            if (!hasGenerated || isGameOver) return;
+            hearts--;
+            updateHeartsUI();
+            
+            answerContainer.classList.remove('hidden');
+            if (hearts <= 0) {
+                triggerGameOver();
+            } else {
+                feedbackMessage.classList.remove('hidden');
+                feedbackMessage.textContent = "⚠️ ยอมแพ้ข้อนี้ เสีย 1 หัวใจ กำลังไปข้อถัดไป...";
+                feedbackMessage.className = "text-sm font-semibold text-amber-500 block animate-fadeIn";
+                setTimeout(() => { generateProblem(); }, 1500);
+            }
+        });
+
+        restartGameBtn.addEventListener('click', restartGame);
+        saveScoreBtn.addEventListener('click', saveScore);
+        viewScoresBtn.addEventListener('click', showScoreboard);
+        closeModalBtn.addEventListener('click', () => scoreboardModal.classList.add('hidden'));
+        closeModalfFn.addEventListener('click', () => scoreboardModal.classList.add('hidden'));
+        
+        clearScoresBtn.addEventListener('click', () => {
+            localStorage.removeItem('math_game_scores_grades');
+            showScoreboard();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyGradeConfig('p1');
+            updateHeartsUI();
+            generateProblem();
+        });
+    </script>
+</body>
+</html>
